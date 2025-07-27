@@ -93,7 +93,7 @@ The plugin ensures no files are overwritten by:
 ### Prerequisites
 
 - Node.js (v22 or higher recommended)
-- Yarn package manager (v4.9.1 or compatible)
+- Yarn package manager (v1.22.22 or compatible)
 
 ### Building
 
