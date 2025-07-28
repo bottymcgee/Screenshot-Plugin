@@ -1,97 +1,58 @@
-# Screenshot Plugin Release Workflow Setup
-
-This document explains how to set up the release workflow for the Screenshot Plugin in the correct repository.
-
-## Problem
-The GitHub Actions workflow was incorrectly placed in the `Highl1te/HighliteDesktop` repository, but it should be in the `bottymcgee/Screenshot-Plugin` repository where the plugin is actually hosted.
-
-## Solution
-
-### Step 1: Create the Workflow in the Correct Repository
-
-1. Go to `https://github.com/bottymcgee/Screenshot-Plugin`
-2. Create the following directory structure: `.github/workflows/`
-3. Create a file named `release.yml` in that directory with the following content:
-
-```yaml
 name: Build/Release Screenshot Plugin
 
 on:
-    release:
-        types: [published]
-    workflow_dispatch:
-        inputs:
-            tag:
-                description: 'Tag name for the release'
-                required: true
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag name for the release'
+        required: true
 
 jobs:
-    build-and-upload:
-        runs-on: ubuntu-latest
-        name: Build and Upload Assets
-        
-        permissions:
-            contents: write
+  build-and-upload:
+    runs-on: ubuntu-latest
+    name: Build and Upload Assets
+    
+    permissions:
+      contents: write
 
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-            - name: Set up Node.js with Corepack (Yarn)
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 'lts/*'
+      - name: Set up Node.js with Corepack (Yarn)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
 
-            - name: Enable Corepack and install dependencies with Yarn
-              run: |
-                  corepack enable
-                  YARN_ENABLE_IMMUTABLE_INSTALLS=false yarn install
+      - name: Enable Corepack and install dependencies with Yarn
+        run: |
+          corepack enable
+          YARN_ENABLE_IMMUTABLE_INSTALLS=false yarn install
 
-            - name: Run build script
-              run: node build.mjs
+      - name: Run build script
+        run: node build.mjs
 
-            - name: Check if dist directory exists
-              run: |
-                  if [ ! -d "dist" ]; then
-                      echo "Error: dist directory not found after build"
-                      exit 1
-                  fi
-                  echo "Build artifacts found in dist directory"
+      - name: Check if dist directory exists
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "Error: dist directory not found after build"
+            exit 1
+          fi
+          echo "Build artifacts found in dist directory"
 
-            - name: Upload release assets
-              uses: softprops/action-gh-release@v2
-              with:
-                  files: dist/**
-                  tag_name: ${{ github.event.release.tag_name || inputs.tag }}
-                  fail_on_unmatched_files: false
-                  update_existing: true
-                  draft: false
-                  prerelease: false
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-```
-
-### Step 2: Test the Workflow
-
-1. **Manual Trigger**:
-   - Go to the "Actions" tab in the `bottymcgee/Screenshot-Plugin` repository
-   - Select the "Build/Release Screenshot Plugin" workflow
-   - Click "Run workflow"
-   - Enter the tag name (e.g., `v1.0.0`)
-   - Click "Run workflow"
-
-2. **Or Create a New Release**:
-   - Go to "Releases" in the repository
-   - Click "Create a new release"
-   - Use the tag `v1.0.0` or a new version
-   - This will automatically trigger the workflow
-
-## Why This Fixes the Issue
-
-1. **No Cross-Repository Permissions**: The workflow now runs in the same repository where the release is being created
-2. **Standard GITHUB_TOKEN**: No need for Personal Access Tokens or special permissions
-3. **Proper Repository Context**: The action can access the repository's releases without permission issues
-
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/**
+          tag_name: ${{ github.event.release.tag_name || inputs.tag }}
+          fail_on_unmatched_files: false
+          update_existing: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ## Files Removed
 
 The following files have been removed from the `Highl1te/HighliteDesktop` repository:
