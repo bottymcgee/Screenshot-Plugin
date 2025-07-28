@@ -53,9 +53,3 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-## Files Removed
-
-The following files have been removed from the `Highl1te/HighliteDesktop` repository:
-- `screenshot-plugin/.github/workflows/release.yml`
-
-This ensures that the workflow only exists in the correct repository where it belongs. 
